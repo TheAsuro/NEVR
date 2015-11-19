@@ -11,11 +11,13 @@ namespace Api
     {
         public abstract class ApiSection
         {
+            public delegate void Callback;
+            public event Callback OnUpdateFinished;
+
             protected TimeSpan CacheDuration { get { return new TimeSpan(0, 15, 0); } }
             protected abstract string SectionUrl { get; }
 
             private DateTime lastUpdate = DateTime.MinValue;
-            private List<Action> waitingCallbacks = new List<Action>();
             private bool waiting = false;
 
             public ApiSection()
@@ -29,14 +31,14 @@ namespace Api
                 {
                     // Time for a real update, request new infos from the server and queue the callback
                     waiting = true;
-                    waitingCallbacks.Add(callback);
+                    OnUpdateFinished += callback;
                     ApiRequest(SectionUrl, (str) => { ProcessUpdate(str); ExecuteCallbacks(); });
                     lastUpdate = DateTime.Now;
                 }
                 else if (waiting)
                 {
                     // We are already updating, queue the callback until update is done
-                    waitingCallbacks.Add(callback);
+                    OnUpdateFinished += callback;
                 }
                 else
                 {
@@ -49,8 +51,8 @@ namespace Api
             private void ExecuteCallbacks()
             {
                 waiting = false;
-                waitingCallbacks.ForEach((action) => { if (action != null) action(); });
-                waitingCallbacks.Clear();
+                if (OnUpdateFinished != null)
+                    OnUpdateFinished();
             }
 
             protected abstract void ProcessUpdate(string updateXML);

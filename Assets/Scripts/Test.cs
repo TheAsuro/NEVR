@@ -8,16 +8,12 @@ public class Test : MonoBehaviour
 
     void Start()
     {
-        EveApi.PlayerKills.Update();
+        EveApi.PlayerKills.Update(DoStuff);
     }
 
     void Update()
     {
-        if (Time.time > 1f && !done)
-        {
-            DoStuff();
-            done = true;
-        }
+        
     }
 
     void DoStuff()
