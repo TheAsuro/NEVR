@@ -10,6 +10,7 @@ public class GalaxyRenderer : MonoBehaviour
     public float particleSize = 1f;
     public GameObject systemClusterPrefab;
     public GameObject connectionClusterPrefab;
+    public GameObject namePrefab;
 
     private Galaxy galaxy;
 
@@ -69,5 +70,11 @@ public class GalaxyRenderer : MonoBehaviour
             return Color.red;
 
         return Color.Lerp(Color.green, Color.red, (float)security);
+    }
+
+    public void AddNameField(string name, int systemID)
+    {
+        GameObject nameSign = Instantiate(namePrefab, galaxy.Systems[systemID].Position * scale + transform.position, Quaternion.identity) as GameObject;
+        nameSign.transform.GetChild(0).GetComponent<UnityEngine.UI.Text>().text = name;
     }
 }
